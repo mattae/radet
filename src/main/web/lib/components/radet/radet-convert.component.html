@@ -1,0 +1,85 @@
+<mat-card>
+    <mat-card-content>
+        <mat-tab-group (selectedTabChange)="tabChanged($event)">
+            <mat-tab label="Conversion">
+                <mat-card>
+                    <mat-card-header class="full-width">
+                        <ng-container *ngIf="running">
+                            <div class="full-width">
+                                <mat-progress-bar class="full-width" mode="indeterminate"></mat-progress-bar>
+                                <mat-form-field class="full-width">
+                                    <input [disabled]="true" matInput [value]="message"/>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="finished">
+                            <div class="full-width">
+                                <mat-form-field class="full-width">
+                                    <input [disabled]="true" matInput [value]="message"/>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <mat-list>
+                            <div mat-subheader>Available Facilities</div>
+                            <mat-list-item *ngFor="let facility of facilities">
+                                <div mat-line>
+                                    <mat-checkbox
+                                            [(ngModel)]="facility.selected"
+                                            labelPosition="after">
+                                        {{facility.name}}
+                                    </mat-checkbox>
+                                </div>
+                            </mat-list-item>
+                        </mat-list>
+                        <mat-divider></mat-divider>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ejs-daterangepicker placeholder="Select Cohort" [start]="'Year'" [format]="'MMM yyyy'"
+                                                     [max]="today"
+                                                     [(value)]="dateRange"
+                                                     [depth]="'Year'">
+                                </ejs-daterangepicker>
+                            </div>
+                            <div class="col-md-6">
+                                <ejs-datepicker placeholder="Select Reporting period" [start]="'Year'"
+                                                [format]="'MMMM y'"
+                                                [(value)]="reportingPeriod"
+                                                (valueChange)="monthChanged($event)"
+                                                [depth]="'Year'">
+                                </ejs-datepicker>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <mat-checkbox [(ngModel)]="current" name="today" *ngIf="todaySelectable">As at today
+                                </mat-checkbox>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-raised-button color="primary"
+                                (click)="convert()"
+                                [disabled]="running || !selected() || !dateRange || !reportingPeriod">Generate Radet
+                        </button>
+                    </mat-card-actions>
+                </mat-card>
+            </mat-tab>
+            <mat-tab label="Download">
+                <mat-list>
+                    <div mat-subheader>Available Radet Files</div>
+                    <mat-list-item *ngFor="let file of files">
+                        <div mat-line>
+                            {{file}}
+                            <button mat-list-icon
+                                    (click)="download(file)">
+                                <mat-icon>file_download</mat-icon>
+                            </button>
+                        </div>
+                    </mat-list-item>
+                </mat-list>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-card-content>
+</mat-card>
