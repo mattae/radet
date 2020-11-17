@@ -17,7 +17,7 @@ menus:
         name: PrEP Report
         icon: keyboard_tab
         type: LINK
-umdLocation: /across/resources/static/radet/js/bundles/radet-1.4.0.umd.min.js
+umdLocation: /across/resources/static/radet/js/bundles/radet-1.4.1.umd.min.js
 webModules:
   - breadcrumb: RADET CONVERTER
     name: RadetModule

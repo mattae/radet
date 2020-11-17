@@ -41,6 +41,8 @@ public class RadetEntry {
     String eacCommenced;
     Date eacCommencementDate;
     Integer eacSessions;
+    String eacCompleted;
+    Date dateOfEACCompletion;
     String repeatViralLoadPostEacCollected;
     Date repeatViralLoadCollectionDate;
     Date repeatViralLoadReceivedDate;

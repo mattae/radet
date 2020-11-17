@@ -1,5 +1,5 @@
 {
-  "name": "radet-1.4.0",
+  "name": "radet-1.4.1",
   "version": "1.0.0",
   "main": "./bundles/lamis-radet.umd.js",
   "module": "./fesm5/lamis-radet.js",

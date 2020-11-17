@@ -199,6 +199,12 @@ public class RadetConverterService {
         cell.setCellValue("Number of EAC Sessions Completed");
         cell.setCellStyle(style);
         cell = row.createCell(cellNum++);
+        cell.setCellValue("EAC Completed?");
+        cell.setCellStyle(style);
+        cell = row.createCell(cellNum++);
+        cell.setCellValue("Date of EAC Completion (yyyy-mm-dd)");
+        cell.setCellStyle(style);
+        cell = row.createCell(cellNum++);
         cell.setCellValue("Repeat Viral Load - Post EAC VL Sample Collected?");
         cell.setCellStyle(style);
         cell = row.createCell(cellNum++);
@@ -379,7 +385,7 @@ public class RadetConverterService {
                     "type = 'CERVICAL_CANCER_SCREENING' and date <= ? AND archived = false ORDER BY date DESC ", rs -> {
                 entry.setScreenedForCervicalCancer("Yes");
                 entry.setCancerScreeningDate(rs.getDate("date"));
-                String screeningMethod = rs.getString("screening_method");
+                String screeningMethod = StringUtils.trimToEmpty(rs.getString("screening_method"));
                 switch (screeningMethod) {
                     case "VIA":
                         screeningMethod = "Visual Inspection with Acetric Acid (VIA)";
@@ -392,7 +398,7 @@ public class RadetConverterService {
                         break;
                 }
                 entry.setCervicalCancerScreeningMethod(screeningMethod);
-                String screeningResult = rs.getString("screening_result");
+                String screeningResult = StringUtils.trimToEmpty(rs.getString("screening_result"));
                 switch (screeningResult) {
                     case "NEGATIVE":
                         screeningResult = "Negative";
@@ -405,7 +411,7 @@ public class RadetConverterService {
                         break;
                 }
                 entry.setResultOfCervicalCancerScreening(screeningResult);
-                String screeningType = rs.getString("screening_type");
+                String screeningType = StringUtils.trimToEmpty(rs.getString("screening_type"));
                 switch (screeningType) {
                     case "FIRST_TIME":
                         screeningType = "First Time";
@@ -418,7 +424,7 @@ public class RadetConverterService {
                         break;
                 }
                 entry.setCervicalCancerScreeningType(screeningType);
-                String treatmentMethod = rs.getString("treatment_method");
+                String treatmentMethod = StringUtils.trimToEmpty(rs.getString("treatment_method"));
                 switch (treatmentMethod) {
                     case "CRYOTHERAPY":
                         treatmentMethod = "Cryotherapy";
@@ -689,8 +695,8 @@ public class RadetConverterService {
             } catch (Exception ignored) {
             }
             if (unsuppressed) {
-                entry.setRepeatViralLoadPostEacCollected("No");
-                query = "SELECT * FROM eac WHERE patient_id = ? and archived = false ORDER BY date_eac1 DESC LIMIT 1";
+                query = "SELECT *, cast(extra->>'completed' as boolean) completed, cast(extra->>'dateCompleted' as date) " +
+                        "date_completed FROM eac WHERE patient_id = ? and archived = false ORDER BY date_eac1 DESC LIMIT 1";
                 jdbcTemplate.query(query, rs -> {
                     entry.setEacCommenced("Yes");
                     entry.setEacCommencementDate(rs.getDate("date_eac1"));
@@ -706,7 +712,14 @@ public class RadetConverterService {
                         entry.setEacSessions(2);
                     }
                     if (rs.getDate("date_eac3") != null) {
+                        entry.setRepeatViralLoadPostEacCollected("No");
                         entry.setEacSessions(3);
+                        if (rs.getBoolean("completed")) {
+                            entry.setEacCompleted("Yes");
+                            entry.setDateOfEACCompletion(rs.getDate("date_completed"));
+                        } else {
+                            entry.setEacCompleted("No");
+                        }
                     }
                     Date dateSampleCollected = rs.getDate("date_sample_collected");
                     if (dateSampleCollected != null) {
@@ -948,6 +961,11 @@ public class RadetConverterService {
             if (entry.getEacSessions() != null) {
                 cell.setCellValue(entry.getEacSessions());
             }
+            cell = row.createCell(cellNum++);
+            cell.setCellValue(entry.getEacCompleted());
+            cell = row.createCell(cellNum++);
+            cell.setCellValue(entry.getDateOfEACCompletion());
+            cell.setCellStyle(dateStyle);
             cell = row.createCell(cellNum++);
             cell.setCellValue(entry.getRepeatViralLoadPostEacCollected());
             cell = row.createCell(cellNum++);
